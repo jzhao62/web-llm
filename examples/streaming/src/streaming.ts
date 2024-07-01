@@ -15,20 +15,22 @@ async function main() {
   const initProgressCallback = (report: webllm.InitProgressReport) => {
     setLabel("init-label", report.text);
   };
-  const selectedModel = "Llama-3-8B-Instruct-q4f32_1";
+  const selectedModel = "Llama-3-8B-Instruct-q4f32_1-MLC";
   const engine: webllm.MLCEngineInterface = await webllm.CreateMLCEngine(
     selectedModel,
-    { initProgressCallback: initProgressCallback }
+    { initProgressCallback: initProgressCallback },
   );
 
   const request: webllm.ChatCompletionRequest = {
     stream: true,
+    stream_options: { include_usage: true },
     messages: [
       {
-        "role": "system",
-        "content": "You are a pirate chatbot who always responds in pirate speak!"
+        role: "system",
+        content:
+          "You are a pirate chatbot who always responds in pirate speak!",
       },
-      { "role": "user", "content": "Who are you?" },
+      { role: "user", content: "Who are you?" },
     ],
     logprobs: true,
     top_logprobs: 2,
@@ -38,15 +40,14 @@ async function main() {
   let message = "";
   for await (const chunk of asyncChunkGenerator) {
     console.log(chunk);
-    if (chunk.choices[0].delta.content) {
-      // Last chunk has undefined content
-      message += chunk.choices[0].delta.content;
-    }
+    message += chunk.choices[0]?.delta?.content || "";
     setLabel("generate-label", message);
+    if (chunk.usage) {
+      console.log(chunk.usage); // only last chunk has usage
+    }
     // engine.interruptGenerate();  // works with interrupt as well
   }
-  console.log("Final message:\n", await engine.getMessage());  // the concatenated message
-  console.log(await engine.runtimeStatsText());
+  console.log("Final message:\n", await engine.getMessage()); // the concatenated message
 }
 
 main();

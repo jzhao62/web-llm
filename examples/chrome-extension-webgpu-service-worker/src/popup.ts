@@ -11,7 +11,6 @@ import {
   MLCEngineInterface,
   InitProgressReport,
 } from "@mlc-ai/web-llm";
-import { prebuiltAppConfig } from "@mlc-ai/web-llm";
 import { ProgressBar, Line } from "progressbar.js";
 
 /***************** UI elements *****************/
@@ -47,8 +46,8 @@ const initProgressCallback = (report: InitProgressReport) => {
 };
 
 const engine: MLCEngineInterface = await CreateExtensionServiceWorkerMLCEngine(
-  "Mistral-7B-Instruct-v0.2-q4f16_1",
-  { initProgressCallback: initProgressCallback }
+  "Mistral-7B-Instruct-v0.2-q4f16_1-MLC",
+  { initProgressCallback: initProgressCallback },
 );
 const chatHistory: ChatCompletionMessageParam[] = [];
 
@@ -150,7 +149,7 @@ function updateAnswer(answer: string) {
 function fetchPageContents() {
   chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
     if (tabs[0]?.id) {
-      var port = chrome.tabs.connect(tabs[0].id, { name: "channelName" });
+      const port = chrome.tabs.connect(tabs[0].id, { name: "channelName" });
       port.postMessage({});
       port.onMessage.addListener(function (msg) {
         console.log("Page contents:", msg.contents);

@@ -17,37 +17,36 @@ async function mainNonStreaming() {
   const initProgressCallback = (report: webllm.InitProgressReport) => {
     setLabel("init-label", report.text);
   };
-  const selectedModel = "Llama-3-8B-Instruct-q4f32_1";
+  const selectedModel = "Llama-3-8B-Instruct-q4f32_1-MLC";
 
-  const engine: webllm.MLCEngineInterface = await webllm.CreateWebWorkerMLCEngine(
-    new Worker(
-      new URL('./worker.ts', import.meta.url),
-      { type: 'module' }
-    ),
-    selectedModel,
-    { initProgressCallback: initProgressCallback }
-  );
+  const engine: webllm.MLCEngineInterface =
+    await webllm.CreateWebWorkerMLCEngine(
+      new Worker(new URL("./worker.ts", import.meta.url), { type: "module" }),
+      selectedModel,
+      { initProgressCallback: initProgressCallback },
+    );
 
   const request: webllm.ChatCompletionRequest = {
     messages: [
       {
-        "role": "system",
-        "content": "You are a helpful, respectful and honest assistant. " +
-          "Be as happy as you can when speaking please. "
+        role: "system",
+        content:
+          "You are a helpful, respectful and honest assistant. " +
+          "Be as happy as you can when speaking please. ",
       },
-      { "role": "user", "content": "Provide me three US states." },
-      { "role": "assistant", "content": "California, New York, Pennsylvania." },
-      { "role": "user", "content": "Two more please!" },
+      { role: "user", content: "Provide me three US states." },
+      { role: "assistant", content: "California, New York, Pennsylvania." },
+      { role: "user", content: "Two more please!" },
     ],
     n: 3,
     temperature: 1.5,
-    max_gen_len: 256,
+    max_tokens: 256,
   };
 
   const reply0 = await engine.chat.completions.create(request);
   console.log(reply0);
 
-  console.log(await engine.runtimeStatsText());
+  console.log(reply0.usage);
 }
 
 /**
@@ -57,46 +56,45 @@ async function mainStreaming() {
   const initProgressCallback = (report: webllm.InitProgressReport) => {
     setLabel("init-label", report.text);
   };
-  const selectedModel = "Llama-3-8B-Instruct-q4f32_1";
+  const selectedModel = "Llama-3-8B-Instruct-q4f32_1-MLC";
 
-  const engine: webllm.MLCEngineInterface = await webllm.CreateWebWorkerMLCEngine(
-    new Worker(
-      new URL('./worker.ts', import.meta.url),
-      { type: 'module' }
-    ),
-    selectedModel,
-    { initProgressCallback: initProgressCallback }
-  );
+  const engine: webllm.MLCEngineInterface =
+    await webllm.CreateWebWorkerMLCEngine(
+      new Worker(new URL("./worker.ts", import.meta.url), { type: "module" }),
+      selectedModel,
+      { initProgressCallback: initProgressCallback },
+    );
 
   const request: webllm.ChatCompletionRequest = {
     stream: true,
+    stream_options: { include_usage: true },
     messages: [
       {
-        "role": "system",
-        "content": "You are a helpful, respectful and honest assistant. " +
-          "Be as happy as you can when speaking please. "
+        role: "system",
+        content:
+          "You are a helpful, respectful and honest assistant. " +
+          "Be as happy as you can when speaking please. ",
       },
-      { "role": "user", "content": "Provide me three US states." },
-      { "role": "assistant", "content": "California, New York, Pennsylvania." },
-      { "role": "user", "content": "Two more please!" },
+      { role: "user", content: "Provide me three US states." },
+      { role: "assistant", content: "California, New York, Pennsylvania." },
+      { role: "user", content: "Two more please!" },
     ],
     temperature: 1.5,
-    max_gen_len: 256,
+    max_tokens: 256,
   };
 
   const asyncChunkGenerator = await engine.chat.completions.create(request);
   let message = "";
   for await (const chunk of asyncChunkGenerator) {
     console.log(chunk);
-    if (chunk.choices[0].delta.content) {
-      // Last chunk has undefined content
-      message += chunk.choices[0].delta.content;
-    }
+    message += chunk.choices[0]?.delta?.content || "";
     setLabel("generate-label", message);
+    if (chunk.usage) {
+      console.log(chunk.usage); // only last chunk has usage
+    }
     // engine.interruptGenerate();  // works with interrupt as well
   }
-  console.log("Final message:\n", await engine.getMessage());  // the concatenated message
-  console.log(await engine.runtimeStatsText());
+  console.log("Final message:\n", await engine.getMessage()); // the concatenated message
 }
 
 // Run one of the function below

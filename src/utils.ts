@@ -31,13 +31,13 @@ function areObjectsEqual(obj1: any, obj2: any): boolean {
 // Function to compare two ModelRecord instances
 export function areModelRecordsEqual(
   record1: ModelRecord,
-  record2: ModelRecord
+  record2: ModelRecord,
 ): boolean {
   // Compare primitive fields
   if (
-    record1.model_url !== record2.model_url ||
+    record1.model !== record2.model ||
     record1.model_id !== record2.model_id ||
-    record1.model_lib_url !== record2.model_lib_url ||
+    record1.model_lib !== record2.model_lib ||
     record1.vram_required_MB !== record2.vram_required_MB ||
     record1.low_resource_required !== record2.low_resource_required ||
     record1.buffer_size_required_bytes !== record2.buffer_size_required_bytes
@@ -70,7 +70,7 @@ export function areModelRecordsEqual(
 
 export function areAppConfigsEqual(
   config1?: AppConfig,
-  config2?: AppConfig
+  config2?: AppConfig,
 ): boolean {
   if (config1 === undefined || config2 === undefined) {
     return config1 === config2;
@@ -99,7 +99,7 @@ export function areAppConfigsEqual(
 
 export function areChatOptionsEqual(
   options1?: ChatOptions,
-  options2?: ChatOptions
+  options2?: ChatOptions,
 ): boolean {
   if (options1 === undefined || options2 === undefined) {
     return options1 === options2;
@@ -110,9 +110,6 @@ export function areChatOptionsEqual(
   if (!areObjectsEqual(options1.conv_config, options2.conv_config))
     return false;
   if (options1.conv_template !== options2.conv_template) return false;
-  if (options1.mean_gen_len !== options2.mean_gen_len) return false;
-  if (options1.max_gen_len !== options2.max_gen_len) return false;
-  if (options1.shift_fill_factor !== options2.shift_fill_factor) return false;
   if (options1.repetition_penalty !== options2.repetition_penalty) return false;
   if (options1.frequency_penalty !== options2.frequency_penalty) return false;
   if (options1.presence_penalty !== options2.presence_penalty) return false;

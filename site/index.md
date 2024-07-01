@@ -3,25 +3,10 @@ layout: default
 title: Home
 notitle: true
 ---
-<script>
-  $(function(){
-    $("#llm_chat").load("llm_chat.html");
-  });
-</script>
 
-# Web LLM
+{% include hero.html %}
 
-**Llama 2 7B/13B are now available in Web LLM!!** Try it out in our [chat demo](#chat-demo).
-
-**Llama 2 70B is also supported.** If you have a Apple Silicon Mac with 64GB or more memory, you can follow the [instructions](#instructions) below to download and launch Chrome Canary and try out the 70B model in Web LLM.
-
-**Mistral 7B models and WizardMath** are all supported!
-
-This project brings large-language model and LLM-based chatbot to web browsers. **Everything runs inside the browser with no server support and accelerated with WebGPU.** This opens up a lot of fun opportunities to build AI assistants for everyone and enable privacy while enjoying GPU acceleration. Please check out our [GitHub repo](https://github.com/mlc-ai/web-llm) to see how we did it.
-You can use WebLLM as a base [npm package](https://www.npmjs.com/package/@mlc-ai/web-llm) and build your own web application on top of it by following the [documentation](https://mlc.ai/mlc-llm/docs/deploy/javascript.html).
-
-
-<img src="img/fig/pitts.png" width="100%">
+## Overview
 
 We have been seeing amazing progress in generative AI and LLM recently. Thanks to the open-source efforts like LLaMA, Alpaca, Vicuna and Dolly, we start to see an exciting future of building our own open source language models and personal AI assistant.
 
@@ -31,29 +16,23 @@ This project is our step to bring more diversity to the ecosystem. Specifically,
 
 Won’t it be even more amazing if we can simply open up a browser and directly bring AI natively to your browser tab? There is some level of readiness in the ecosystem. This project provides an affirmative answer to the question.
 
+## Key Features
+- **In-Browser Inference**: WebLLM is a high-performance, in-browser language model inference engine that leverages WebGPU for hardware acceleration, enabling powerful LLM operations directly within web browsers without server-side processing.
 
-## Instructions
+- [**Full OpenAI API Compatibility**](https://github.com/mlc-ai/web-llm?tab=readme-ov-file#full-openai-compatibility): Seamlessly integrate your app with WebLLM using OpenAI API with functionalities such as JSON-mode, function-calling, streaming, and more.
 
-WebGPU just shipped in Chrome 113.
+- [**Extensive Model Support**](https://github.com/mlc-ai/web-llm?tab=readme-ov-file#built-in-models): WebLLM natively supports a range of models including Llama, Phi, Gemma, RedPajama, Mistral, Qwen(通义千问), and many others, making it versatile for various AI tasks.
 
-Select the model you want to try out. Enter your inputs, click “Send” – we are ready to go!
-The chat bot will first fetch model parameters into local cache. The download may take a few minutes, only for the first run.
-The subsequent refreshes and runs will be faster. We have tested it on Windows and Mac, you will need a GPU with about 6GB memory to run Llama-7B, Vicuna-7B, and about 3GB memory to run RedPajama-3B.
+- [**Custom Model Integration**](https://github.com/mlc-ai/web-llm?tab=readme-ov-file#custom-models): Easily integrate and deploy custom models in MLC format, allowing you to adapt WebLLM to specific needs and scenarios, enhancing flexibility in model deployment.
 
-## Chat Demo
+- **Plug-and-Play Integration**: Easily integrate WebLLM into your projects using package managers like NPM and Yarn, or directly via CDN, complete with comprehensive [examples](https://github.com/mlc-ai/web-llm/tree/main/examples) and a modular design for connecting with UI components.
 
-The chat demo is based on [Llama 3](https://llama.meta.com/llama3/), [Gemma](https://blog.google/technology/developers/gemma-open-models/), [Mistral-7B](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) and its variants, and many more. More model supports are on the way.
+- **Streaming & Real-Time Interactions**: Supports streaming chat completions, allowing real-time output generation which enhances interactive applications like chatbots and virtual assistants.
 
-<div id="llm_chat"></div>
+- **Web Worker & Service Worker Support**: Optimize UI performance and manage the lifecycle of models efficiently by offloading computations to separate worker threads or service workers.
 
-Models with "-1k" suffix signify 1024 context length, lowering ~2-3GB VRAM requirement compared to their counterparts. Feel free to start trying with those.
-
-
-## Links
-
-- [Web LLM GitHub](https://github.com/mlc-ai/web-llm)
-- You might also be interested in [Web Stable Diffusion](https://websd.mlc.ai/).
+- **Chrome Extension Support**: Extend the functionality of web browsers through custom Chrome extensions using WebLLM, with examples available for building both basic and advanced extensions.
 
 ## Disclaimer
 
-This demo site is for research purposes only, subject to the model License of LLaMA, Vicuna and RedPajama. Please contact us if you find any potential violation.
+The [demo site](https://chat.webllm.ai) is for research purposes only, subject to the model License of LLaMA, Vicuna and RedPajama. Please contact us if you find any potential violation.

@@ -6,11 +6,10 @@ console.log("Use web worker for logit processor");
 
 const myLogitProcessor = new MyLogitProcessor();
 const logitProcessorRegistry = new Map<string, webllm.LogitProcessor>();
-logitProcessorRegistry.set("Phi2-q4f32_1", myLogitProcessor);
+logitProcessorRegistry.set("phi-2-q4f32_1-MLC", myLogitProcessor);
 
-const engine = new webllm.MLCEngine();
-engine.setLogitProcessorRegistry(logitProcessorRegistry);
-const handler = new webllm.MLCEngineWorkerHandler(engine);
+const handler = new webllm.WebWorkerMLCEngineHandler();
+handler.setLogitProcessorRegistry(logitProcessorRegistry);
 self.onmessage = (msg: MessageEvent) => {
   handler.onmessage(msg);
 };

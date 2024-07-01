@@ -8,25 +8,14 @@ function setLabel(id: string, text: string) {
   label.innerText = text;
 }
 
-
 async function main() {
-
-  const myAppConfig: webllm.AppConfig = {
-    model_list: [
-      {
-        "model_url": "https://huggingface.co/mlc-ai/gorilla-openfunctions-v2-q4f16_1-MLC/resolve/main/",
-        "model_id": "gorilla-openfunctions-v2-q4f16_1",
-        "model_lib_url": "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/gorilla-openfunctions-v2/gorilla-openfunctions-v2-q4f16_1.wasm",
-      },
-    ]
-  }
   const initProgressCallback = (report: webllm.InitProgressReport) => {
     setLabel("init-label", report.text);
   };
-  const selectedModel = "gorilla-openfunctions-v2-q4f16_1"
+  const selectedModel = "Hermes-2-Pro-Llama-3-8B-q4f16_1-MLC";
   const engine: webllm.MLCEngineInterface = await webllm.CreateMLCEngine(
     selectedModel,
-    { appConfig: myAppConfig, initProgressCallback: initProgressCallback }
+    { initProgressCallback: initProgressCallback },
   );
 
   const tools: Array<webllm.ChatCompletionTool> = [
@@ -36,33 +25,56 @@ async function main() {
         name: "get_current_weather",
         description: "Get the current weather in a given location",
         parameters: {
-          "type": "object",
-          "properties": {
-            "location": {
-              "type": "string",
-              "description": "The city and state, e.g. San Francisco, CA",
+          type: "object",
+          properties: {
+            location: {
+              type: "string",
+              description: "The city and state, e.g. San Francisco, CA",
             },
-            "unit": { "type": "string", "enum": ["celsius", "fahrenheit"] },
+            unit: { type: "string", enum: ["celsius", "fahrenheit"] },
           },
-          "required": ["location"],
+          required: ["location"],
         },
       },
-    }
-  ]
+    },
+  ];
 
   const request: webllm.ChatCompletionRequest = {
-    stream: false,
+    stream: true, // works with stream as well, where the last chunk returns tool_calls
+    stream_options: { include_usage: true },
     messages: [
-      { "role": "user", "content": "What is the current weather in celsius in Pittsburgh and Tokyo?" },
+      {
+        role: "user",
+        content:
+          "What is the current weather in celsius in Pittsburgh and Tokyo?",
+      },
     ],
-    tool_choice: 'auto',
+    tool_choice: "auto",
     tools: tools,
   };
 
-  const reply0 = await engine.chat.completions.create(request);
-  console.log(reply0.choices[0].message.content);
-
-  console.log(await engine.runtimeStatsText());
+  if (!request.stream) {
+    const reply0 = await engine.chat.completions.create(request);
+    console.log(reply0.choices[0]);
+    console.log(reply0.usage);
+  } else {
+    // If streaming, the last chunk returns tool calls
+    const asyncChunkGenerator = await engine.chat.completions.create(request);
+    let message = "";
+    let lastChunk: webllm.ChatCompletionChunk | undefined;
+    let usageChunk: webllm.ChatCompletionChunk | undefined;
+    for await (const chunk of asyncChunkGenerator) {
+      console.log(chunk);
+      message += chunk.choices[0]?.delta?.content || "";
+      setLabel("generate-label", message);
+      if (!chunk.usage) {
+        lastChunk = chunk;
+      }
+      usageChunk = chunk;
+    }
+    console.log(lastChunk!.choices[0].delta);
+    console.log(usageChunk!.usage);
+  }
 }
 
 main();
